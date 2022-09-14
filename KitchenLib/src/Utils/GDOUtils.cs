@@ -11,6 +11,21 @@ namespace KitchenLib.Utils
 		private static Dictionary<string, Item.ItemProcess> customItemProcesses = new Dictionary<string, Item.ItemProcess>();
 		private static Dictionary<string, Appliance.ApplianceProcesses> customApplianceProcesses = new Dictionary<string, Appliance.ApplianceProcesses>();
 
+		public static IReadOnlyDictionary<int, Appliance> getAppliances()
+        {
+			return appliances;
+        }
+
+		public static IReadOnlyDictionary<int, Item> getItems()
+		{
+			return items;
+		}
+
+		public static IReadOnlyDictionary<string, Process> getProcesses()
+		{
+			return processes;
+		}
+
 		public static void SetupGDOIndex(GameData gameData)
 		{
 			foreach (Item item in gameData.Get<Item>())

@@ -5,24 +5,26 @@ using KitchenData;
 using KitchenLib.Utils;
 using System.Collections.Generic;
 using System.Reflection;
+using KitchenLib.Events;
 
 namespace KitchenLib.Customs
 {
 	[HarmonyPatch(typeof(GameDataConstructor), "BuildGameData", new Type[] { })]
 	public class GameDataConstructor_Patch
 	{
-
-		static void Postfix(KitchenData.GameDataConstructor __instance, KitchenData.GameData __result) {
+		static void Postfix(KitchenData.GameDataConstructor __instance, KitchenData.GameData __result)
+        {
 			MaterialUtils.SetupMaterialIndex(__result);
 
-			GDOUtils.SetupGDOIndex(__result);			
+			GDOUtils.SetupGDOIndex(__result);
 
 			var prefabHostObject = new UnityEngine.GameObject();
 			prefabHostObject.name = "Custom Appliance Prefab Host";
 			prefabHostObject.SetActive(false);
 
-			List<GameDataObject> gameDataObjects = new List<GameDataObject>();
+			EventUtils.InvokeEvent(nameof(Handlers.GameDataConstructor), Handlers.GameDataConstructor?.GetInvocationList(), null, new GameDataConstructorEventArgs(GDOUtils.getAppliances(), GDOUtils.getItems(), GDOUtils.getProcesses()));
 
+			List<GameDataObject> gameDataObjects = new List<GameDataObject>();
 
 			foreach (CustomProcess process in CustomGDO.Processes.Values) //Adds Custom Process to GDOs
 			{
@@ -57,12 +59,12 @@ namespace KitchenLib.Customs
 
 			foreach (CustomItem item in CustomGDO.Items.Values) //Adds Custom Items to GDOs
 			{
-				Item newItem= createItem(__result, item);
+				Item newItem = createItem(__result, item);
 				item.OnRegister(newItem);
 				item.Item = newItem;
 				gameDataObjects.Add(newItem);
 			}
-			
+
 			foreach (GameDataObject gameDataObject in gameDataObjects)
 			{
 				try
@@ -89,7 +91,7 @@ namespace KitchenLib.Customs
 					__result.Prefabs.Add(gameDataObject.ID, hasPrefab.Prefab);
 				}
 			}
-			
+
 			foreach (GameDataObject gameDataObject in gameDataObjects)
 			{
 				gameDataObject.SetupFinal();
