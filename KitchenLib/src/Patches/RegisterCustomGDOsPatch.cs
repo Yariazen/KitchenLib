@@ -9,7 +9,7 @@ using KitchenLib.Systems;
 using KitchenLib.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Reflection;
+using KitchenLib.src.Patches;
 
 namespace KitchenLib.Patches
 {
@@ -23,6 +23,7 @@ namespace KitchenLib.Patches
 		{
 			Main.LogDebug("[RegisterCustomGDOsPatch.Postfix] [1.1] Begin Custom GDO Registration");
 			MaterialUtils.SetupMaterialIndex();
+			FontUtils.SetupFontIndex();
 			GDOUtils.SetupGDOIndex(__result);
 			ColorblindUtils.Init(__result);
 
@@ -155,6 +156,16 @@ namespace KitchenLib.Patches
 						}
 
 						ItemGroupViewUtils.AddPossibleSide(__result, item);
+					}
+
+					if (gameDataObject.GetType() == typeof(PlayerCosmetic))
+					{
+						PlayerCosmetic cosmetic = (PlayerCosmetic)gameDataObject;
+						if (!cosmetic.DisableInGame)
+						{
+							if (cosmetic.CosmeticType == CosmeticType.Hat) { CosmeticMenuPatch.Hats.Add(cosmetic); }
+							if (cosmetic.CosmeticType == CosmeticType.Outfit) { CosmeticMenuPatch.Outfits.Add(cosmetic); }
+						}
 					}
 				}
 			}

@@ -19,6 +19,7 @@ namespace KitchenLib.Customs
 		public virtual Item.ItemProcess AutomaticItemProcess { get; protected set; }
 		public virtual List<IItemProperty> Properties { get; protected set; } = new List<IItemProperty>();
         public virtual float ExtraTimeGranted { get; protected set; }
+		public virtual Factor EatingTime { get; protected set; }
         public virtual ItemValue ItemValue { get; protected set; } = ItemValue.Small;
 
         [Obsolete("Please use ItemValue instead.")]
@@ -29,6 +30,8 @@ namespace KitchenLib.Customs
         public virtual int MaxOrderSharers { get; protected set; }
 		public virtual int AlwaysOrderAdditionalItem { get; protected set; }
 		public virtual bool AutoSatisfied { get; protected set; }
+		public virtual List<Item> SatisfiedBy { get; protected set; } = new List<Item>();
+		public virtual List<Item> NeedsIngredients { get; protected set; } = new List<Item>();
         public virtual Item SplitSubItem { get; protected set; }
         public virtual int SplitCount { get; protected set; } = 0;
         public virtual float SplitSpeed { get; protected set; } = 1f;
@@ -37,6 +40,7 @@ namespace KitchenLib.Customs
         public virtual bool PreventExplicitSplit { get; protected set; }
         public virtual bool SplitByComponents { get; protected set; }
         public virtual Item SplitByComponentsHolder { get; protected set; }
+        public virtual Item SplitByComponentsWrapper { get; protected set; }
         public virtual bool SplitByCopying { get; protected set; }
         public virtual Item RefuseSplitWith { get; protected set; }
         public virtual Item DisposesTo { get; protected set; }
@@ -46,6 +50,7 @@ namespace KitchenLib.Customs
         public virtual Appliance DedicatedProvider { get; protected set; }
         public virtual ToolAttachPoint HoldPose { get; protected set; } = ToolAttachPoint.Generic;
         public virtual bool IsMergeableSide { get; protected set; }
+        public virtual Dish CreditSourceDish { get; protected set; }
         public virtual Item ExtendedDirtItem { get; protected set; }
         public virtual string ColourBlindTag { get; protected set; }
         public virtual int RewardOverride { get; protected set; } = -1;
@@ -55,7 +60,7 @@ namespace KitchenLib.Customs
         {
 			Item result = ScriptableObject.CreateInstance<Item>();
 
-			Main.LogDebug($"[CustomItem.Convert] [1.1] Convering Base");
+			Main.LogDebug($"[CustomItem.Convert] [1.1] Converting Base");
 
 			if (BaseGameDataObjectID != -1)
                 result = UnityEngine.Object.Instantiate(gameData.Get<Item>().FirstOrDefault(a => a.ID == BaseGameDataObjectID));
@@ -64,6 +69,7 @@ namespace KitchenLib.Customs
             if (result.Prefab != Prefab) result.Prefab = Prefab;
 			if (!AutomaticItemProcess.Equals(result.AutomaticItemProcess)) result.AutomaticItemProcess = AutomaticItemProcess;
             if (result.ExtraTimeGranted != ExtraTimeGranted) result.ExtraTimeGranted = ExtraTimeGranted;
+            if (!result.EatingTime.Equals(EatingTime)) result.EatingTime = EatingTime;
             if (result.ItemValue != ItemValue) result.ItemValue = ItemValue;
 			if (result.IsConsumedByCustomer != IsConsumedByCustomer) result.IsConsumedByCustomer = IsConsumedByCustomer;
             if (result.MaxOrderSharers != MaxOrderSharers) result.MaxOrderSharers = MaxOrderSharers;
@@ -81,7 +87,7 @@ namespace KitchenLib.Customs
             if (result.HoldPose != HoldPose) result.HoldPose = HoldPose;
             if (result.IsMergeableSide != IsMergeableSide) result.IsMergeableSide = IsMergeableSide;
 
-			Main.LogDebug($"[CustomItem.Convert] [1.2] Convering Overrides");
+			Main.LogDebug($"[CustomItem.Convert] [1.2] Converting Overrides");
 
 			if (!string.IsNullOrEmpty(ColourBlindTag))
 			{
@@ -116,17 +122,21 @@ namespace KitchenLib.Customs
         {
             Item result = (Item)gameDataObject;
 
-			Main.LogDebug($"[CustomItem.AttachDependentProperties] [1.1] Convering Base");
+			Main.LogDebug($"[CustomItem.AttachDependentProperties] [1.1] Converting Base");
 
 			if (result.Properties != Properties) result.Properties = Properties;
             if (result.DirtiesTo != DirtiesTo) result.DirtiesTo = DirtiesTo;
             if (result.MayRequestExtraItems != MayRequestExtraItems) result.MayRequestExtraItems = MayRequestExtraItems;
+            if (result.SatisfiedBy != SatisfiedBy) result.SatisfiedBy = SatisfiedBy;
+            if (result.NeedsIngredients != NeedsIngredients) result.NeedsIngredients = NeedsIngredients;
             if (result.SplitSubItem != SplitSubItem) result.SplitSubItem = SplitSubItem;
             if (result.SplitDepletedItems != SplitDepletedItems) result.SplitDepletedItems = SplitDepletedItems;
             if (result.SplitByComponentsHolder != SplitByComponentsHolder) result.SplitByComponentsHolder = SplitByComponentsHolder;
+            if (result.SplitByComponentsWrapper != SplitByComponentsWrapper) result.SplitByComponentsWrapper = SplitByComponentsWrapper;
             if (result.RefuseSplitWith != RefuseSplitWith) result.RefuseSplitWith = RefuseSplitWith;
             if (result.DisposesTo != DisposesTo) result.DisposesTo = DisposesTo;
             if (result.DedicatedProvider != DedicatedProvider) result.DedicatedProvider = DedicatedProvider;
+            if (result.CreditSourceDish != CreditSourceDish) result.CreditSourceDish = CreditSourceDish;
             if (result.ExtendedDirtItem != ExtendedDirtItem) result.ExtendedDirtItem = ExtendedDirtItem;
 
             FieldInfo processes = ReflectionUtils.GetField<Item>("Processes");
