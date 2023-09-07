@@ -13,6 +13,22 @@ namespace KitchenLib.JSON.Patches
 	internal class JsonDishPatches
 	{
 		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonDish), nameof(JsonDish.UnlockItemOverride), MethodType.Getter)]
+		public static void Postfix_get_UnlockItemOverride(JsonDish __instance, ref Item __result)
+		{
+			__result = GDOConverter<Item>(__instance.TempUnlockItemOverride);
+		}
+
+		[HarmonyPatch]
+		[HarmonyPatch(typeof(JsonDish), nameof(JsonDish.AlsoAddRecipes), MethodType.Getter)]
+		public static void Postfix_get_AlsoAddRecipes(JsonDish __instance, ref List<Dish> __result)
+		{
+			__result = __instance.TempAlsoAddRecipes
+				.Select(_ => GDOConverter<Dish>(_))
+				.ToList();
+		}
+
+		[HarmonyPostfix]
 		[HarmonyPatch(typeof(JsonDish), nameof(JsonDish.ExtraOrderUnlocks), MethodType.Getter)]
 		public static void Postfix_get_ExtraOrderUnlocks(JsonDish __instance, ref HashSet<Dish.IngredientUnlock> __result)
 		{
@@ -85,6 +101,24 @@ namespace KitchenLib.JSON.Patches
 		public static void Postfix_get_RequiredDishItem(JsonDish __instance, ref Item __result)
 		{
 			__result = GDOConverter<Item>(__instance.TempRequiredDishItem);
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonDish), nameof(JsonDish.HardcodedRequirements), MethodType.Getter)]
+		public static void Postfix_get_HardcodedRequirements(JsonDish __instance, ref List<Unlock> __result)
+		{
+			__result = __instance.TempHardcodedRequirements
+				.Select(_ => GDOConverter<Unlock>(_))
+				.ToList();
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonDish), nameof(JsonDish.HardcodedBlockers), MethodType.Getter)]
+		public static void Postfix_get_HardcodedBlockers(JsonDish __instance, ref List<Unlock> __result)
+		{
+			__result = __instance.TempHardcodedBlockers
+				.Select(_ => GDOConverter<Unlock>(_))
+				.ToList();
 		}
 
 		[HarmonyPostfix]

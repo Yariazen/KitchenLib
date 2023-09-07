@@ -1,10 +1,9 @@
-﻿using KitchenData;
+﻿using Kitchen;
+using KitchenData;
 using KitchenLib.Customs;
 using KitchenLib.JSON.Interfaces;
 using KitchenLib.JSON.JsonConverters;
 using KitchenLib.JSON.Models.Containers;
-using KitchenLib.JSON.Models.Views;
-using KitchenLib.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ using UnityEngine;
 
 namespace KitchenLib.JSON.Models.Jsons
 {
-	internal class JsonItemGroup : CustomItemGroup<JsonItemGroupView>, IHasSidePrefab
+	internal class JsonItemGroup : CustomItemGroup<ItemGroupView>, IHasSidePrefab
 	{
 		[field: JsonProperty("UniqueNameID", Required = Required.Always)]
 		[JsonIgnore]
@@ -25,9 +24,8 @@ namespace KitchenLib.JSON.Models.Jsons
 		[JsonProperty("Materials")]
 		public MaterialsContainer Materials { get; set; }
 
-		[JsonProperty("View")]
-		[JsonConverter(typeof(ViewConverter))]
-		public ItemGroupViewContainer View { get; set; }
+		[JsonProperty("ComponentGroups")]
+		public List<ComponentGroupContainer> ComponentGroups { get; set; } = new();
 
 		[JsonIgnore]
 		public override List<ItemGroup.ItemSet> Sets { get; protected set; } = new();
@@ -67,6 +65,16 @@ namespace KitchenLib.JSON.Models.Jsons
 		public List<string> TempMayRequestExtraItems { get; set; } = new();
 
 		[JsonIgnore]
+		public override List<Item> SatisfiedBy { get; protected set; } = new();
+		[JsonProperty("SatisfiedBy")]
+		public List<string> TempSatisfiedBy { get; set; } = new();
+
+		[JsonIgnore]
+		public override List<Item> NeedsIngredients { get; protected set; } = new();
+		[JsonProperty("NeedsIngredients")]
+		public List<string> TempNeedsIngredients { get; set; } = new();
+
+		[JsonIgnore]
 		public override Item SplitSubItem { get; protected set; }
 		[JsonProperty("SplitSubItem")]
 		public string TempSplitSubItem { get; set; }
@@ -75,6 +83,16 @@ namespace KitchenLib.JSON.Models.Jsons
 		public override List<Item> SplitDepletedItems { get; protected set; } = new();
 		[JsonProperty("SplitDepletedItems")]
 		public List<string> TempSplitDepletedItems { get; set; } = new();
+
+		[JsonIgnore]
+		public override Item SplitByComponentsHolder { get; protected set; }
+		[JsonProperty("SplitByComponentsHolder")]
+		public string TempSplitByComponentsHolder { get; set; }
+
+		[JsonIgnore]
+		public override Item SplitByComponentsWrapper { get; protected set; }
+		[JsonProperty("SplitByComponentsWrapper")]
+		public string TempSplitByComponentsWrapper { get; set; }
 
 		[JsonIgnore]
 		public override Item RefuseSplitWith { get; protected set; }
@@ -90,6 +108,11 @@ namespace KitchenLib.JSON.Models.Jsons
 		public override Appliance DedicatedProvider { get; protected set; }
 		[JsonProperty("DedicatedProvider")]
 		public string TempDedicatedProvider { get; set; }
+
+		[JsonIgnore]
+		public override Dish CreditSourceDish { get; protected set; }
+		[JsonProperty("CreditSourceDish")]
+		public string TempCreditSourceDish { get; set; }
 
 		[JsonIgnore]
 		public override Item ExtendedDirtItem { get; protected set; }
@@ -110,7 +133,7 @@ namespace KitchenLib.JSON.Models.Jsons
 
 			Materials.Convert(gameDataObject.Prefab);
 
-			gameDataObject.Prefab.GetComponent<JsonItemGroupView>().Setup(gameDataObject.Prefab, View);
+			gameDataObject.Prefab.GetComponent<ItemGroupView>().ComponentGroups = ComponentGroups.ConvertAll(_ => _.Convert(gameDataObject.Prefab));
 		}
 	}
 }

@@ -21,6 +21,16 @@ namespace KitchenLib.JSON.Models.Jsons
 		public string GDOName { get; set; }
 
 		[JsonIgnore]
+		public override Item UnlockItemOverride { get; protected set; }
+		[JsonProperty("UnlockItemOverride")]
+		public string TempUnlockItemOverride { get; set; }
+
+		[JsonIgnore]
+		public override List<Dish> AlsoAddRecipes { get; protected set; } = new();
+		[JsonProperty("AlsoAddRecipes")]
+		public List<string> TempAlsoAddRecipes { get; set; } = new();
+
+		[JsonIgnore]
 		public override HashSet<Dish.IngredientUnlock> ExtraOrderUnlocks { get; protected set; } = new();
 		[JsonProperty("ExtraOrderUnlocks")]
 		public List<IngredientUnlockContainer> TempExtraOrderUnlocks { get; set; } = new();
@@ -66,6 +76,16 @@ namespace KitchenLib.JSON.Models.Jsons
 		public override Item RequiredDishItem { get; protected set; }
 		[JsonProperty("RequiredDishItem")]
 		public string TempRequiredDishItem { get; set; }
+
+		[JsonIgnore]
+		public override List<Unlock> HardcodedRequirements { get; protected set; } = new();
+		[JsonProperty("HardcodedRequirements")]
+		public List<string> TempHardcodedRequirements { get; set; } = new();
+
+		[JsonIgnore]
+		public override List<Unlock> HardcodedBlockers { get; protected set; } = new();
+		[JsonProperty("HardcodedBlockers")]
+		public List<string> TempHardcodedBlockers { get; set; } = new();
 
 		[JsonIgnore]
 		public override List<Unlock> AllowedFoods { get; protected set; } = new();

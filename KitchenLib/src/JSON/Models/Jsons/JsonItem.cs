@@ -10,6 +10,7 @@ using System.Runtime.Serialization;
 using UnityEngine;
 using KitchenLib.Utils;
 using KitchenLib.JSON.Models.Views;
+using Kitchen;
 
 namespace KitchenLib.JSON.Models.Jsons
 {
@@ -26,8 +27,7 @@ namespace KitchenLib.JSON.Models.Jsons
 		public MaterialsContainer Materials { get; set; }
 
 		[JsonProperty("View")]
-		[JsonConverter(typeof(ViewConverter))]
-		public object View { get; set; }
+		public ItemViewContainer View { get; set; }
 
 		[JsonIgnore]
 		public override GameObject Prefab { get; protected set; }
@@ -62,6 +62,16 @@ namespace KitchenLib.JSON.Models.Jsons
 		public List<string> TempMayRequestExtraItems { get; set; } = new();
 
 		[JsonIgnore]
+		public override List<Item> SatisfiedBy { get; protected set; } = new();
+		[JsonProperty("SatisfiedBy")]
+		public List<string> TempSatisfiedBy { get; set; } = new();
+
+		[JsonIgnore]
+		public override List<Item> NeedsIngredients { get; protected set; } = new();
+		[JsonProperty("NeedsIngredients")]
+		public List<string> TempNeedsIngredients { get; set; } = new();
+
+		[JsonIgnore]
 		public override Item SplitSubItem { get; protected set; }
 		[JsonProperty("SplitSubItem")]
 		public string TempSplitSubItem { get; set; }
@@ -70,6 +80,16 @@ namespace KitchenLib.JSON.Models.Jsons
 		public override List<Item> SplitDepletedItems { get; protected set; } = new();
 		[JsonProperty("SplitDepletedItems")]
 		public List<string> TempSplitDepletedItems { get; set; } = new();
+
+		[JsonIgnore]
+		public override Item SplitByComponentsHolder { get; protected set; }
+		[JsonProperty("SplitByComponentsHolder")]
+		public string TempSplitByComponentsHolder { get; set; }
+
+		[JsonIgnore]
+		public override Item SplitByComponentsWrapper { get; protected set; }
+		[JsonProperty("SplitByComponentsWrapper")]
+		public string TempSplitByComponentsWrapper { get; set; }
 
 		[JsonIgnore]
 		public override Item RefuseSplitWith { get; protected set; }
@@ -85,6 +105,11 @@ namespace KitchenLib.JSON.Models.Jsons
 		public override Appliance DedicatedProvider { get; protected set; }
 		[JsonProperty("DedicatedProvider")]
 		public string TempDedicatedProvider { get; set; }
+
+		[JsonIgnore]
+		public override Dish CreditSourceDish { get; protected set; }
+		[JsonProperty("CreditSourceDish")]
+		public string TempCreditSourceDish { get; set; }
 
 		[JsonIgnore]
 		public override Item ExtendedDirtItem { get; protected set; }
@@ -105,18 +130,18 @@ namespace KitchenLib.JSON.Models.Jsons
 
 			Materials.Convert(gameDataObject.Prefab);
 
-			if (View is ObjectsSplittableViewContainer ObjectsSplittableView)
+			if (View != null)
 			{
-				if (!Prefab.HasComponent<JsonObjectsSplittableView>())
+				if (View.FullPosition != null && View.EmptyPosition != null)
 				{
-					Prefab.AddComponent<JsonObjectsSplittableView>().Setup(gameDataObject.Prefab, ObjectsSplittableView);
+					if (Prefab.HasComponent<PositionSplittableView>())
+					{
+						Prefab.AddComponent<PositionSplittableView>().Setup(Prefab, View);
+					}
 				}
-			}
-			else if (View is PositionSplittableViewContainer PositionSplittableView)
-			{
-				if (!Prefab.HasComponent<JsonPositionSplittableView>())
+				if (Prefab.HasComponent<ObjectsSplittableView>())
 				{
-					Prefab.AddComponent<JsonPositionSplittableView>().Setup(gameDataObject.Prefab, PositionSplittableView);
+					Prefab.AddComponent<ObjectsSplittableView>().Setup(Prefab, View);
 				}
 			}
 		}

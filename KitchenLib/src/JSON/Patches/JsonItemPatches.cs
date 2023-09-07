@@ -59,6 +59,24 @@ namespace KitchenLib.JSON.Patches
 		}
 
 		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonItem), nameof(JsonItem.SatisfiedBy), MethodType.Getter)]
+		public static void Postfix_get_SatisfiedBy(JsonItem __instance, ref List<Item> __result)
+		{
+			__result = __instance.TempSatisfiedBy
+				.Select(_ => GDOConverter<Item>(_))
+				.ToList();
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonItem), nameof(JsonItem.NeedsIngredients), MethodType.Getter)]
+		public static void Postfix_get_NeedsIngredients(JsonItem __instance, ref List<Item> __result)
+		{
+			__result = __instance.TempNeedsIngredients
+				.Select(_ => GDOConverter<Item>(_))
+				.ToList();
+		}
+
+		[HarmonyPostfix]
 		[HarmonyPatch(typeof(JsonItem), nameof(JsonItem.SplitSubItem), MethodType.Getter)]
 		public static void Postfix_get_SplitSubItem(JsonItem __instance, ref Item __result)
 		{
@@ -72,6 +90,20 @@ namespace KitchenLib.JSON.Patches
 			__result = __instance.TempSplitDepletedItems
 				.Select(_ => GDOConverter<Item>(_))
 				.ToList();
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonItem), nameof(JsonItem.SplitByComponentsHolder), MethodType.Getter)]
+		public static void Postfix_get_SplitByComponentsHolder(JsonItem __instance, ref Item __result)
+		{
+			__result = GDOConverter<Item>(__instance.TempSplitByComponentsHolder);
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonItem), nameof(JsonItem.SplitByComponentsWrapper), MethodType.Getter)]
+		public static void Postfix_get_SplitByComponentsWrapper(JsonItem __instance, ref Item __result)
+		{
+			__result = GDOConverter<Item>(__instance.TempSplitByComponentsWrapper);
 		}
 
 		[HarmonyPostfix]
@@ -93,6 +125,13 @@ namespace KitchenLib.JSON.Patches
 		public static void Postfix_get_DedicatedProvider(JsonItem __instance, ref Appliance __result)
 		{
 			__result = GDOConverter<Appliance>(__instance.TempDedicatedProvider);
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonItem), nameof(JsonItem.CreditSourceDish), MethodType.Getter)]
+		public static void Postfix_get_CreditSourceDish(JsonItem __instance, ref Dish __result)
+		{
+			__result = GDOConverter<Dish>(__instance.TempCreditSourceDish);
 		}
 
 		[HarmonyPostfix]

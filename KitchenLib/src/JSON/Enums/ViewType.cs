@@ -2,7 +2,6 @@
 {
 	public enum ViewType
 	{
-		ItemGroupView,
 		ObjectsSplittableView,
 		PositionSplittableView
 	}

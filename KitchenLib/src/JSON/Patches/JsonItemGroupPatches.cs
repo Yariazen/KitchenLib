@@ -13,6 +13,15 @@ namespace KitchenLib.JSON.Patches
 	internal class JsonItemGroupPatches
 	{
 		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonItemGroup), nameof(JsonItemGroup.Sets), MethodType.Getter)]
+		public static void Postfix_get_Sets(JsonItemGroup __instance, ref List<ItemGroup.ItemSet> __result)
+		{
+			__result = __instance.TempSets
+				.Select(_ => _.Convert())
+				.ToList();
+		}
+
+		[HarmonyPostfix]
 		[HarmonyPatch(typeof(JsonItemGroup), nameof(JsonItemGroup.Prefab), MethodType.Getter)]
 		public static void Postfix_get_Prefab(JsonItemGroup __instance, ref GameObject __result)
 		{
@@ -59,6 +68,24 @@ namespace KitchenLib.JSON.Patches
 		}
 
 		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonItemGroup), nameof(JsonItemGroup.SatisfiedBy), MethodType.Getter)]
+		public static void Postfix_get_SatisfiedBy(JsonItemGroup __instance, ref List<Item> __result)
+		{
+			__result = __instance.TempSatisfiedBy
+				.Select(_ => GDOConverter<Item>(_))
+				.ToList();
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonItemGroup), nameof(JsonItemGroup.NeedsIngredients), MethodType.Getter)]
+		public static void Postfix_get_NeedsIngredients(JsonItemGroup __instance, ref List<Item> __result)
+		{
+			__result = __instance.TempNeedsIngredients
+				.Select(_ => GDOConverter<Item>(_))
+				.ToList();
+		}
+
+		[HarmonyPostfix]
 		[HarmonyPatch(typeof(JsonItemGroup), nameof(JsonItemGroup.SplitSubItem), MethodType.Getter)]
 		public static void Postfix_get_SplitSubItem(JsonItemGroup __instance, ref Item __result)
 		{
@@ -72,6 +99,20 @@ namespace KitchenLib.JSON.Patches
 			__result = __instance.TempSplitDepletedItems
 				.Select(_ => GDOConverter<Item>(_))
 				.ToList();
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonItemGroup), nameof(JsonItemGroup.SplitByComponentsHolder), MethodType.Getter)]
+		public static void Postfix_get_SplitByComponentsHolder(JsonItemGroup __instance, ref Item __result)
+		{
+			__result = GDOConverter<Item>(__instance.TempSplitByComponentsHolder);
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonItemGroup), nameof(JsonItemGroup.SplitByComponentsWrapper), MethodType.Getter)]
+		public static void Postfix_get_SplitByComponentsWrapper(JsonItemGroup __instance, ref Item __result)
+		{
+			__result = GDOConverter<Item>(__instance.TempSplitByComponentsWrapper);
 		}
 
 		[HarmonyPostfix]
@@ -96,19 +137,17 @@ namespace KitchenLib.JSON.Patches
 		}
 
 		[HarmonyPostfix]
+		[HarmonyPatch(typeof(JsonItemGroup), nameof(JsonItemGroup.CreditSourceDish), MethodType.Getter)]
+		public static void Postfix_get_CreditSourceDish(JsonItemGroup __instance, ref Dish __result)
+		{
+			__result = GDOConverter<Dish>(__instance.TempCreditSourceDish);
+		}
+
+		[HarmonyPostfix]
 		[HarmonyPatch(typeof(JsonItemGroup), nameof(JsonItemGroup.ExtendedDirtItem), MethodType.Getter)]
 		public static void Postfix_get_ExtendedDirtItem(JsonItemGroup __instance, ref Item __result)
 		{
 			__result = GDOConverter<Item>(__instance.TempExtendedDirtItem);
-		}
-
-		[HarmonyPostfix]
-		[HarmonyPatch(typeof(JsonItemGroup), nameof(JsonItemGroup.Sets), MethodType.Getter)]
-		public static void Postfix_get_Sets(JsonItemGroup __instance, ref List<ItemGroup.ItemSet> __result)
-		{
-			__result = __instance.TempSets
-				.Select(_ => _.Convert())
-				.ToList();
 		}
 	}
 }
